@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -32,6 +31,7 @@ func fetchArticle(db *leveldb.DB, key string, article *Article) {
 }
 
 //example of how to do stuff
+/*
 func main() {
 	db, err := leveldb.OpenFile("farticles", nil)
 	if err != nil {
@@ -45,3 +45,4 @@ func main() {
 	fetchArticle(db, "lezfuckin_go", &article)
 	fmt.Println(article.Content[0])
 }
+*/
