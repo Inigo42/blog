@@ -72,18 +72,17 @@ a.nav-link:active
 <body>
     
 <article>
-    <h1 >Lorem ipsum dolor sit amet</h1>
+    <h1 >{{.Title}}</h1>
     <br>
     <div class="row">
     <img src="https://i.pinimg.com/originals/9b/76/8e/9b768e465ece0acb4f1c9f001caf36b3.jpg" alt="Avatar" class="avatar">
-    <h4 style="margin-left: 100px;">Jeremi Forman-Duranona</h4>
+    <h4 style="margin-left: 100px;">{{.Author}}</h4>
     </div>
     <hr>
     <br><br><br>
-    <p>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</p>
-    <p>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</p>
-    <p>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</p>
-
+    {{range $i, $a := .Content}}
+    <p>{{$a}}</p>
+    {{end}}
 </article>
 </body>
 </html>

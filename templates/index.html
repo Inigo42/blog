@@ -54,16 +54,17 @@ body{
 
 
 
-
       <div class="column" >
         <div class="container">
           <h1 style="margin-left: 15px;">Articles:</h1>
             <div name="Articles" class="col-sm">
               <hr>
               {{range $i, $a := .Stuff}}
+              <a href="">  <!--the href should have the link to the blog article-->
                 <div class="row" style="margin-top: 10px; margin-left: 5px;">
                   {{$a}}
                 </div>
+              </a>
                 <hr>
               {{end}}
 

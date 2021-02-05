@@ -1,19 +1,53 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 
 	//"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
+
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
-var templates *template.Template
-
+//----------------database and whatnot------------------
 type Payload struct {
 	Stuff [3]string
 	Link  string
 }
+
+var err error
+
+type Article struct {
+	Title   string   `json:"title"`
+	Index   int      `json:index`
+	Author  string   `json:author`
+	Content []string `json:content`
+}
+
+func addArticle(db *leveldb.DB, article Article, key string) {
+	testArticle := article
+	superBytes := new(bytes.Buffer)
+	json.NewEncoder(superBytes).Encode(testArticle)
+	db.Put([]byte(key), superBytes.Bytes(), nil)
+}
+
+func deleteArticle(db *leveldb.DB, key string) {
+	db.Delete([]byte(key), nil)
+}
+
+func fetchArticle(db *leveldb.DB, key string, article *Article) {
+	data, err := db.Get([]byte(key), nil)
+	if err != nil {
+		panic("OH FUCKAROOONIE DOOO, we were not able to fetch the article")
+	}
+	json.Unmarshal(data, &article)
+}
+
+//-----------------http-----------------------------------------
+var templates *template.Template
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	words := [3]string{"first title", "second title", "third title"}
@@ -31,7 +65,15 @@ func testingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func basicArticleHandler(w http.ResponseWriter, r *http.Request) {
-	templates.ExecuteTemplate(w, "article.html", nil)
+	db, err := leveldb.OpenFile("farticles", nil)
+	if err != nil {
+		panic("fuck")
+	}
+	defer db.Close()
+
+	var article Article
+	fetchArticle(db, "2", &article)
+	templates.ExecuteTemplate(w, "article.html", article)
 }
 
 func main() {
