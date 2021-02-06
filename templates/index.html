@@ -60,7 +60,7 @@ body{
             <div name="Articles" class="col-sm">
               <hr>
               {{range $i, $a := .Stuff}}
-              <a href="">  <!--the href should have the link to the blog article-->
+              <a href="/{{$i}}">  <!--the href should have the link to the blog article-->
                 <div class="row" style="margin-top: 10px; margin-left: 5px;">
                   {{$a}}
                 </div>
