@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	//"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -76,52 +78,45 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.html", payload)
 }
 
-/*
-func testingHandler(w http.ResponseWriter, r *http.Request) {
-	stuff := []string{"blah1", "blah2", "blah3"}
-	link2xkcd := "https://imgs.xkcd.com/comics/hug_count.png"
-
-	payload := Payload{Stuff: stuff, Link: link2xkcd}
-	templates.ExecuteTemplate(w, "testing.html", payload)
-}
-*/
-func basicArticleHandler(w http.ResponseWriter, r *http.Request) {
-	k := r.URL.Path[1:]
-
+func getKeys() []string {
 	db, err := leveldb.OpenFile("farticles", nil)
 	if err != nil {
 		panic("fuck")
 	}
 	defer db.Close()
-
-	var article Article
-	fetchArticle(db, k, &article)
-	templates.ExecuteTemplate(w, "article.html", article)
+	var keys []string
+	iter := db.NewIterator(nil, nil)
+	for iter.Next() {
+		// Remember that the contents of the returned slice should not be modified, and
+		// only valid until the next call to Next.
+		keys = append(keys, string(iter.Key()))
+	}
+	return keys
 }
 
 func main() {
-	/*
+	r := chi.NewRouter()
+
+	r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idString := chi.URLParam(r, "id")
+		idNumber, err := strconv.Atoi(idString)
+		if err != nil {
+			http.Error(w, "that's not a number, dummy: "+idString, http.StatusBadRequest)
+			return
+		}
 		db, err := leveldb.OpenFile("farticles", nil)
 		if err != nil {
 			panic("fuck")
 		}
 		defer db.Close()
-		var keys []string
-		iter := db.NewIterator(nil, nil)
-		for iter.Next() {
-			// Remember that the contents of the returned slice should not be modified, and
-			// only valid until the next call to Next.
-			keys = append(keys, string(iter.Key()))
-		}
-		for _, key := range keys {
-			http.HandleFunc(key, basicArticleHandler)
-		}
-	*/
+		idString = strconv.Itoa(idNumber + 1)
+		var article Article
+		fetchArticle(db, idString, &article)
+		templates.ExecuteTemplate(w, "article.html", article)
+	})
 	templates = template.Must(template.ParseGlob("templates/*.html"))
 	fmt.Println("THIS WILL BE AN AWESOME BLOG!!!")
 
-	http.HandleFunc("/", indexHandler)
-	//http.HandleFunc("/testing", testingHandler)
-	http.HandleFunc("/test_article", basicArticleHandler)
-	http.ListenAndServe(":8080", nil)
+	r.Get("/", indexHandler)
+	http.ListenAndServe(":8080", r)
 }
