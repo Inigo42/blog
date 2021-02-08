@@ -16,7 +16,7 @@ import (
 
 //----------------database and whatnot------------------
 type Payload struct {
-	Stuff        []string
+	Farticles    []farticle
 	Link         string
 	ArticleLinks []string
 }
@@ -52,6 +52,17 @@ func fetchArticle(db *leveldb.DB, key string, article *Article) {
 //-----------------http-----------------------------------------
 var templates *template.Template
 
+func reverse(a []string) {
+	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
+		a[i], a[j] = a[j], a[i]
+	}
+}
+
+type farticle struct {
+	Title string
+	Key   int
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	//words := []string{"first title", "second title", "third title"}
 	link2xkcd := "https://imgs.xkcd.com/comics/hug_count.png"
@@ -68,13 +79,26 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		keys = append(keys, string(iter.Key()))
 	}
 	var titles []string
+
 	var article Article
 	for _, key := range keys {
 		fetchArticle(db, key, &article)
 		title := article.Title
 		titles = append(titles, title)
 	}
-	payload := Payload{Stuff: titles, Link: link2xkcd, ArticleLinks: keys}
+	reverse(titles)
+	reverse(keys)
+	var k []int
+	var x int
+	for _, key := range keys {
+		x, _ = strconv.Atoi(key)
+		k = append(k, x-1)
+	}
+	var farticles []farticle
+	for i, title := range titles {
+		farticles = append(farticles, farticle{title, k[i]})
+	}
+	payload := Payload{Farticles: farticles, Link: link2xkcd, ArticleLinks: keys}
 	templates.ExecuteTemplate(w, "index.html", payload)
 }
 

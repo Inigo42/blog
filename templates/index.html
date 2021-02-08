@@ -59,10 +59,10 @@ body{
           <h1 style="margin-left: 15px;">Articles:</h1>
             <div name="Articles" class="col-sm">
               <hr>
-              {{range $i, $a := .Stuff}}
-              <a href="/{{$i}}">  <!--the href should have the link to the blog article-->
-                <div class="row" style="margin-top: 10px; margin-left: 5px;">
-                  {{$a}}
+              {{range $i, $farticle := .Farticles}}
+              <a href="/{{$farticle.Key}}">  <!--the href should have the link to the blog article-->
+                <div class="row" style="margin-top: 10px; margin-left: 5px; color: #fb3f00;">
+                  {{$farticle.Title}}
                 </div>
               </a>
                 <hr>

@@ -59,7 +59,7 @@ func generate_Article() {
 		}
 	}
 
-	title := "Learning Go by Writing the Code for this Blog"
+	title := "Learning Go by Writing the Code for this Blog, but different, hahah"
 	author := "Jeremi Forman-Duranona"
 	content := []string{`Well, this has been a bit of a journey. It started with me wanting to both learn 
 	a language more powerful than python but not quite as low level as C++ or beurocratic as Java, and make a website from the bottom up. 
@@ -72,7 +72,17 @@ func generate_Article() {
 }
 
 func main() {
-	generate_Article()
+	//generate_Article()
+	
+	db, err := leveldb.OpenFile("farticles", nil)
+	if err != nil {
+		panic("fuck")
+	}
+	defer db.Close()
+	deleteArticle(db, "3")
+	/*	addArticle(db, Article{"superduper title", 1, "Jeremi Forman-Duranona",
+		[]string{"Bravely Bold Sir Robin, rode forth from Camelot."}}, "test_article")
+	*/
 }
 
 //example of how to do stuff
